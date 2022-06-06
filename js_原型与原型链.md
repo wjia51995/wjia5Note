@@ -40,3 +40,5 @@ Person.prototype.__proto__ == object.prototype
   * 表达式： A instanceof B
   * 如果B函数的显示原型对象（B.prototype）在A对象的原型链上，返回true，否则返回false 
 * Function是通过new自己产生的实例
+
+# 继承实现方式
