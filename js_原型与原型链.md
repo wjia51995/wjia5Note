@@ -42,3 +42,80 @@ Person.prototype.__proto__ == object.prototype
 * Function是通过new自己产生的实例
 
 # 继承实现方式
+
+* 组合继承（伪经典继承）
+
+```js
+        function SuperType (name) {
+            this.name = name;
+            this.colors = ['red', 'blue', 'green'];
+        }
+        SuperType.prototype.sayName = function () {
+            alert(this.name)
+        }
+
+        function SubType (name, age) {
+            // 继承属性，第一次调用SuperType
+            SuperType.call(this, name);
+            this.age = age;
+        }
+        // 继承方法，第二次调用SuperType
+        SubType.prototype = new SuperType();
+        SubType.prototype.constructor = SubType;
+
+        SubType.prototype.sayAge = function () {
+            alert(this.age);
+        }
+
+        var instance = new SubType('Amily', 27);
+        alert(instance.colors);
+        instance.sayName();
+        instance.sayAge();
+```
+
+SubType.prototype为SuperType实例，则SubType.prototype的原型为SuperType.prototype，因此继承了SuperType.prototype的方法，但同时也构造了两个不必要的属性name和colors，name为undefined，colors为['red', 'blue', 'green']。不过SubType的实例，由于使用了SuperType.call(this, name)，其创造了和SubType.prototype同名的属性，因此实例的属性会屏蔽掉其原型上的属性。
+
+由于SubType.prototype为SuperType实例，因此SubType.prototype的constructor，与其原型SubType.prototype相同，即为SuperType。我们需使用SubType.prototype.constructor = SubType手动将其改回来。
+
+优点是结构简单易懂，缺点是子类的原型会存在不必要的属性，同时父类构造函数会被调用两次。
+
++ 寄生组合继承
+
+```js
+        function SuperType (name) {
+            this.name = name;
+            this.colors = ['red', 'blue', 'green'];
+        }
+        SuperType.prototype.sayName = function () {
+            alert(this.name)
+        }
+
+        function SubType (name, age) {
+            // 继承属性
+            SuperType.call(this, name);
+            this.age = age;
+        }
+		// 继承方法，该语句最终效果等同于SubType.prototype.__proto__ = SuperType.prototype，但__proto__属性不是每个浏览器都可以访问，存在兼容问题
+        inheritPrototype(SubType, SuperType);
+
+        SubType.prototype.sayAge = function () {
+            alert(this.age);
+        }
+
+        var instance = new SubType('Amily', 27);
+        instance.sayName();
+
+        function inheritPrototype (subType, superType) {
+            var prototype = object(superType.prototype);
+            prototype.constructor = subType;
+            subType.prototype = prototype;
+        }
+		// 返回一个原型为o且不存在属性的实例，
+        function object (o) {
+            function F () {};
+            F.prototype = o;
+            return new F();
+        }
+```
+
+寄生组合继承只调用一次SuperType构造函数，且避免在SubType.prototype上面创建不必要的、多余的属性，为最理想的继承方式。
