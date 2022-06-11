@@ -119,3 +119,32 @@ SubType.prototype为SuperType实例，则SubType.prototype的原型为SuperType.
 ```
 
 寄生组合继承只调用一次SuperType构造函数，且避免在SubType.prototype上面创建不必要的、多余的属性，为最理想的继承方式。
+
+# es6 class继承写法
+
+```js
+        class Person {
+            constructor (name, age) {
+                this.name = name;
+                this.age = age;
+            }
+            introduce () {
+                alert('我是'+ this.name + ',年龄' + this.age + '。');
+            }
+        }
+
+        class teacher extends Person {
+            constructor (name, age, grade) {
+                super(name, age);
+                this.grade = grade;
+            }
+            saySomething () {
+                alert('我教' + this.grade + '年级');
+            }
+        }
+
+        var teacher1 = new teacher('王五', 29, 6);
+        teacher1.introduce();
+        teacher1.saySomething();
+```
+
